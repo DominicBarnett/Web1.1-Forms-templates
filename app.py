@@ -17,33 +17,67 @@ def homepage():
 @app.route('/froyo')
 def choose_froyo():
     """Shows a form to collect the user's Fro-Yo order."""
-    pass
+    return """
+    <form action="/froyo_results" method="GET">
+        What is your favorite Fro-Yo flavor? <br/>
+        <input type="text" name="flavor"><br/>
+        What are your favorite toppings?
+        <input type="text" name="toppings"><br/>
+        <input type="submit" value="Submit!">
+    </form>
+    """
 
 @app.route('/froyo_results')
 def show_froyo_results():
-    """Shows the user what they ordered from the previous page."""
-    pass
+    users_froyo_flavor = request.args.get('flavor')
+    users_toppings = request.args.get('toppings')
+    return f'You ordered {users_froyo_flavor} flavored Fro-Yo! The toppings you added are {users_toppings}'
+
 
 @app.route('/favorites')
 def favorites():
     """Shows the user a form to choose their favorite color, animal, and city."""
-    pass
+    return """
+    <form action="/favorite_results" method="GET">
+        What is your favorite color? <br/>
+        <input type="text" name="color"><br/>
+        What is your favorite animal?
+        <input type="text" name="animal"><br/>
+        What is your favorite city?<br/>
+        <input type="text" name="city"><br/>
+        <input type="submit" value="Submit!">
+    </form>
+    """
 
 @app.route('/favorites_results')
 def favorites_results():
     """Shows the user a nice message using their form results."""
-    pass
+    favorite_color = request.args.get('color')
+    favorite_animal = request.args.get('animal')
+    favorite_city = request.args.get('city')
+
+    return f"Wow, I didn't know {favorite_color} {favorite_animal} lived in {favorite_city}"
 
 @app.route('/secret_message')
 def secret_message():
     """Shows the user a form to collect a secret message. Sends the result via
     the POST method to keep it a secret!"""
-    pass
+    return """
+    <form action="/message_results" method="POST">
+        What is your secret message? <br/>
+        <input type="text" name="message"><br/>
+        <input type="submit" value="Submit!">
+    </form>
+    """
 
 @app.route('/message_results', methods=['POST'])
 def message_results():
     """Shows the user their message, with the letters in sorted order."""
-    pass
+    users_message = request.form.get('message')
+    sorted_message = sort_letters(users_message)
+
+    return f"Here's your secret message! {sorted_message}"
+
 
 @app.route('/calculator')
 def calculator():
@@ -66,8 +100,24 @@ def calculator():
 @app.route('/calculator_results')
 def calculator_results():
     """Shows the user the result of their calculation."""
-    pass
-
+    users_selected_operand = request.args.get('operation')
+    users_operand1 = request.args.get('operand1') 
+    users_operand2 = request.args.get('operand2')
+    
+    if users_selected_operand == "add":
+        result = int(users_operand1) + int(users_operand2)
+        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+    elif users_selected_operand == "subtract":
+        result = int(users_operand1) - int(users_operand2)
+        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+    elif users_selected_operand == "multiply":
+        result = int(users_operand1) * int(users_operand2)
+        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+    elif users_selected_operand == "divide":
+        result = int(users_operand1) / int(users_operand2)
+        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+    
+    
 
 HOROSCOPE_PERSONALITIES = {
     'aries': 'Adventurous and energetic',
