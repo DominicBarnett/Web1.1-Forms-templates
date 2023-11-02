@@ -17,22 +17,17 @@ def homepage():
 @app.route('/froyo')
 def choose_froyo():
     """Shows a form to collect the user's Fro-Yo order."""
-    return """
-    <form action="/froyo_results" method="GET">
-        What is your favorite Fro-Yo flavor? <br/>
-        <input type="text" name="flavor"><br/>
-        What are your favorite toppings?
-        <input type="text" name="toppings"><br/>
-        <input type="submit" value="Submit!">
-    </form>
-    """
+    return render_template('froyo_form.html')
 
 @app.route('/froyo_results')
 def show_froyo_results():
-    users_froyo_flavor = request.args.get('flavor')
-    users_toppings = request.args.get('toppings')
-    return f'You ordered {users_froyo_flavor} flavored Fro-Yo! The toppings you added are {users_toppings}'
-
+    
+    context = {
+        'users_froyo_flavor': request.args.get('flavor'),
+        'users_toppings': request.args.get('toppings')
+    }
+        
+    return render_template('froyo_results.html', **context)
 
 @app.route('/favorites')
 def favorites():
@@ -82,40 +77,38 @@ def message_results():
 @app.route('/calculator')
 def calculator():
     """Shows the user a form to enter 2 numbers and an operation."""
-    return """
-    <form action="/calculator_results" method="GET">
-        Please enter 2 numbers and select an operator.<br/><br/>
-        <input type="number" name="operand1">
-        <select name="operation">
-            <option value="add">+</option>
-            <option value="subtract">-</option>
-            <option value="multiply">*</option>
-            <option value="divide">/</option>
-        </select>
-        <input type="number" name="operand2">
-        <input type="submit" value="Submit!">
-    </form>
-    """
+    return render_template('calculator_form.html')
 
 @app.route('/calculator_results')
 def calculator_results():
     """Shows the user the result of their calculation."""
     users_selected_operand = request.args.get('operation')
-    users_operand1 = request.args.get('operand1') 
-    users_operand2 = request.args.get('operand2')
-    
+    users_operand1 = int(request.args.get('operand1'))
+    users_operand2 = int(request.args.get('operand2'))
+
+   
     if users_selected_operand == "add":
-        result = int(users_operand1) + int(users_operand2)
-        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+        result = users_operand1 + users_operand2
     elif users_selected_operand == "subtract":
-        result = int(users_operand1) - int(users_operand2)
-        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+        result = users_operand1 - users_operand2
     elif users_selected_operand == "multiply":
-        result = int(users_operand1) * int(users_operand2)
-        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+        result = users_operand1 * users_operand2
     elif users_selected_operand == "divide":
-        result = int(users_operand1) / int(users_operand2)
-        return f"You chose to {users_selected_operand} {users_operand1} and {users_operand2}. Your result is: {str(result)}"
+        if users_operand2 == 0:
+            result = "Cannot divide by zero"
+        else:
+            result = users_operand1 / users_operand2
+    else:
+        result = "Invalid operation"
+
+    context = {
+        'users_selected_operand': users_selected_operand,
+        'users_operand1': users_operand1,
+        'users_operand2': users_operand2,
+        'result': result,
+    }
+
+    return render_template('calculator_results.html', **context)
     
     
 
@@ -144,19 +137,23 @@ def horoscope_results():
     """Shows the user the result for their chosen horoscope."""
 
     # TODO: Get the sign the user entered in the form, based on their birthday
-    horoscope_sign = ''
-
+    horoscope_sign = request.args.get('horoscope_sign')
+    users_name = request.args.get('users_name')
     # TODO: Look up the user's personality in the HOROSCOPE_PERSONALITIES
     # dictionary based on what the user entered
-    users_personality = ''
+    if horoscope_sign in HOROSCOPE_PERSONALITIES:
+        users_personality = HOROSCOPE_PERSONALITIES[horoscope_sign]
+    else:
+        users_personality = "Horoscope sign not found"
 
     # TODO: Generate a random number from 1 to 99
-    lucky_number = 0
+    lucky_number = random.randint(1,99)
 
     context = {
         'horoscope_sign': horoscope_sign,
         'personality': users_personality, 
-        'lucky_number': lucky_number
+        'lucky_number': lucky_number,
+        'users_name': users_name
     }
 
     return render_template('horoscope_results.html', **context)
